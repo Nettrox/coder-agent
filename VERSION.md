@@ -1,33 +1,89 @@
-# Coder Agent
-
 Version
 
-0.1.0
+Current Version
 
-Completed
+v0.1.0-alpha
 
-✔ Scanner
+⸻
 
-✔ Reader
+Release Name
 
-✔ Knowledge
+Foundation Architecture
 
-✔ Knowledge Processor
+⸻
 
-✔ Retriever
+Release Date
 
-In Progress
+2026-07-06
 
-⬜ Context Builder
+⸻
 
-⬜ Writer
+Status
 
-⬜ Backup
+Active Development
 
-⬜ Reviewer
+⸻
 
-⬜ Memory
+Description
 
-Architecture
+This release establishes the architectural foundation of the AI Coder Agent.
 
-Generation 1
+The project now includes a complete modular pipeline, structured knowledge generation, reusable prompt architecture, living documentation, and deterministic communication between AI agents.
+
+No automatic file writing is performed in this version. Generated changes are validated but not yet applied to the project.
+
+⸻
+
+Implemented
+
+Core Infrastructure
+
+* Project Scanner
+* Reader
+* Knowledge Processor
+* Project Reports
+* Knowledge Database
+
+AI Pipeline
+
+* Planner AI
+* Retriever AI
+* Context Builder AI
+* Coder AI
+* Validator AI
+* Fixer AI
+
+Prompt System
+
+* Prompt Builder
+* Shared Runtime Rules
+* Agent Definitions
+* Prompt Validation
+* Prompt Cache
+
+Documentation
+
+* Architecture Documentation
+* Module Documentation
+* Roadmap Framework
+* ADR Framework
+* Version History
+* Documentation Templates
+* Living Documentation
+
+⸻
+
+Planned for Next Version
+
+* Writer Engine
+* Apply Agent Changes
+* Automatic File Writing
+* Backup Engine
+* Rollback Support
+* Reviewer AI
+
+⸻
+
+Long-Term Vision
+
+The long-term objective is to transform AI Coder Agent into a fully autonomous software engineering platform capable of understanding, planning, implementing, validating, documenting, and maintaining software projects through a scalable multi-agent architecture.

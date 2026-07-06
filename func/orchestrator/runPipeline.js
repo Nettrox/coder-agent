@@ -4,6 +4,7 @@ import { runCoder } from "./runCoder.js";
 import { runValidator } from "./runValidator.js";
 import { runFixer } from "./runFixer.js";
 import { buildRetrieverContext } from "../context/buildRetrieverContext.js";
+import { runContextBuilder } from "./runContextBuilder.js";
 
 export async function runPipeline(projectPath, agentContext) {
   const plannerOutput = await runPlanner(projectPath, agentContext);
@@ -16,11 +17,17 @@ export async function runPipeline(projectPath, agentContext) {
     projectPath,
     retrieverOutput
   );
+  const contextBuilderOutput = await runContextBuilder(projectPath, agentContext, {
+    plannerOutput,
+    retrieverOutput,
+    fileContext,
+    });
 
   const coderOutput = await runCoder(projectPath, agentContext, {
     plannerOutput,
     retrieverOutput,
     fileContext,
+    contextBuilderOutput,
   });
 
   const validatorOutput = await runValidator(projectPath, agentContext, {
@@ -47,13 +54,21 @@ export async function runPipeline(projectPath, agentContext) {
     reason: finalOutput?.reason || "",
     warnings: finalOutput?.warnings || [],
     errors: finalOutput?.errors || [],
+
     data: {
-      planner: plannerOutput,
-      retriever: retrieverOutput,
-      file_context: fileContext,
-      coder: coderOutput,
-      validator: validatorOutput,
-      final: finalOutput,
+        agents: {
+        planner: plannerOutput,
+        retriever: retrieverOutput,
+        context_builder: contextBuilderOutput,
+        coder: coderOutput,
+        validator: validatorOutput,
+        },
+
+        contexts: {
+        file_context: fileContext,
+        },
+
+        final: finalOutput,
     },
-  };
+    };
 }

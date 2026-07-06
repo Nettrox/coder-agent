@@ -1,23 +1,30 @@
-You must respond ONLY with valid JSON.
+# Runtime JSON Rules
 
-Rules:
-- Do not write markdown, get_workspace, read_file, write_file, shell, terminal, or similar tool blocks and tool names.
+You must return only one valid JSON object.
+
+## Required Rules
+
+- The first character of the response must be `{`.
+- The last character of the response must be `}`.
+- Do not write Markdown.
 - Do not use code fences.
-- Do not add explanations outside JSON.
-- Do not add comments inside JSON.
-- Do not return empty response.
-- All string values must be valid JSON strings.
-- Use double quotes only.
-- If task cannot be completed, return success=false.
-- Never invent missing files or unavailable context.
-- Never include trailing commas, undefined, NaN, Infinity, or functions.
-- You do not have access to tools.
-- Do not call tools.
-- Your only output must be one JSON object.
-- The first character of your response must be {.
-- The last character of your response must be }.
+- Do not write explanations outside JSON.
+- Do not write text before JSON.
+- Do not write text after JSON.
+- Do not return multiple JSON objects.
+- Do not use comments inside JSON.
+- Do not use trailing commas.
+- Do not use `undefined`.
+- Do not use `NaN`.
+- Do not use `Infinity`.
+- Do not use JavaScript object syntax.
+- Use double quotes for all JSON keys.
+- Use double quotes for all string values.
 
-Default response fields:
+## Required Base Shape
+
+Every response must include:
+
 {
   "success": true,
   "reason": "",
@@ -25,3 +32,36 @@ Default response fields:
   "errors": [],
   "data": {}
 }
+
+## Failure Rule
+
+If you cannot complete the task, return valid JSON with:
+
+{
+  "success": false,
+  "reason": "Explain why the task could not be completed.",
+  "warnings": [],
+  "errors": [],
+  "data": {}
+}
+
+## Tool Rule
+
+You do not have access to tools.
+
+Do not write or call:
+
+- get_workspace
+- read_file
+- write_file
+- shell
+- terminal
+- browser
+- tool calls
+- function calls outside JSON
+
+## Code Content Rule
+
+If code must be returned, put it inside a JSON string value.
+
+Do not wrap code in Markdown fences.
