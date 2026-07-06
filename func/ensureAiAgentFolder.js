@@ -1,20 +1,15 @@
 import fs from "fs/promises";
 import path from "path";
+import { AI_AGENT, AI_AGENT_DIRECTORIES } from "../config/aiAgentConfig.js";
 
 export async function ensureAiAgentFolder(projectPath) {
-  const aiAgentPath = path.join(projectPath, ".ai-agent");
+  const aiAgentRoot = path.join(projectPath, AI_AGENT.ROOT);
 
-  const folders = [
-    aiAgentPath,
-    path.join(aiAgentPath, "sessions"),
-    path.join(aiAgentPath, "logs"),
-    path.join(aiAgentPath, "outputs"),
-    path.join(aiAgentPath, "memory"),
-  ];
-
-  for (const folder of folders) {
-    await fs.mkdir(folder, { recursive: true });
+  for (const directory of AI_AGENT_DIRECTORIES) {
+    await fs.mkdir(path.join(aiAgentRoot, directory), {
+      recursive: true,
+    });
   }
 
-  return aiAgentPath;
+  return aiAgentRoot;
 }

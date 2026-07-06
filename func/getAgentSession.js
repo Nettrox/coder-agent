@@ -2,11 +2,19 @@ import fs from "fs/promises";
 import path from "path";
 import { createNewSession } from "./createNewSession.js";
 import { formatSessionsMarkdown } from "./formatMarkdown.js";
+import { AI_AGENT } from "../config/aiAgentConfig.js";
 
 export async function getAgentSession(projectPath, agentName) {
-  const sessionsDir = path.join(projectPath, ".ai-agent", "sessions");
-  const sessionFile = path.join(sessionsDir, "agents.json");
-  const sessionMdFile = path.join(sessionsDir, "agents.md");
+  const sessionsDir = path.join(
+    projectPath,
+    AI_AGENT.ROOT,
+    AI_AGENT.DIRS.SESSIONS
+  );
+
+  await fs.mkdir(sessionsDir, { recursive: true });
+
+  const sessionFile = path.join(sessionsDir, AI_AGENT.FILES.AGENTS_JSON);
+  const sessionMdFile = path.join(sessionsDir, AI_AGENT.FILES.AGENTS_MD);
 
   let sessions = {};
 
