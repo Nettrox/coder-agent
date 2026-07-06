@@ -1,11 +1,13 @@
-export async function newAskOdysseus(sessionId, question) {
+export async function askAiSession(sessionId, message, options = {}) {
+  const { stream = false } = options;
+
   const response = await fetch("http://127.0.0.1:7000/api/chat_stream", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      message: question,
+      message,
       session: sessionId,
       mode: "chat",
       use_rag: false,
@@ -43,7 +45,10 @@ export async function newAskOdysseus(sessionId, question) {
 
         if (json.delta) {
           answer += json.delta;
-          process.stdout.write(json.delta);
+
+          if (stream) {
+            process.stdout.write(json.delta);
+          }
         }
       } catch {}
     }

@@ -1,27 +1,35 @@
-import { createNewSession } from "./func/createNewSession.js";
 import { getInput } from "./func/getInput.js";
-import { saveCurrentSession } from "./func/saveCurrentSession.js";
-import { newAskOdysseus } from "./func/newAskOdysseus.js";
-import { getLatestSessionId } from "./func/getLatestSessionId.js";
-import {oldAskOdysseus} from "./func/oldAskOdysseus.js";
+import { ensureAiAgentFolder } from "./func/ensureAiAgentFolder.js";
+import { runAgent } from "./func/runAgent.js";
 
-//get input from user (this func will not be used for implementation projects)
-const question = await getInput();
+const projectPath = await getInput("Project path: ");
+const userRequest = await getInput("Request: ");
 
-// new chat (func for create a new chat)
-const sessionId = await createNewSession();
-const lastSessionId = await getLatestSessionId();
-await newAskOdysseus(sessionId, question);
-await saveCurrentSession(sessionId);
-console.log("New Session ID:", sessionId);
+await ensureAiAgentFolder(projectPath);
 
-// latest chat (if there is a existing chat this func can be used)
-await oldAskOdysseus(lastSessionId, question);
-console.log("Old Session ID:", lastSessionId);
+const plannerOutput = await runAgent("planner", projectPath, {
+  user_request: userRequest,
+});
 
-// print response and user input
-console.log("Question:", question);
-console.log("Answer:");
+const coderOutput = await runAgent("coder", projectPath, {
+  user_request: userRequest,
+  planner_output: plannerOutput,
+});
 
+const validatorOutput = await runAgent("validator", projectPath, {
+  user_request: userRequest,
+  planner_output: plannerOutput,
+  coder_output: coderOutput,
+});
 
+let finalOutput = coderOutput;
 
+if (validatorOutput?.data?.needs_fixer) {
+  finalOutput = await runAgent("fixer", projectPath, {
+    user_request: userRequest,
+    validator_output: validatorOutput,
+    coder_output: coderOutput,
+  });
+}
+
+console.log(JSON.stringify(finalOutput, null, 2));
