@@ -1,0 +1,27 @@
+User
+ │
+ ▼
+Planner
+ │
+ ▼
+Retriever
+ │
+ ▼
+Context Builder
+ │
+ ▼
+Coder
+ │
+ ▼
+Validator
+ │
+ ├───────────────┐
+ │               │
+ ▼               │
+Writer           │
+ │               │
+ ▼               │
+Verifier         │
+ │               │
+ ▼               │
+Done ◄──────── Fixer
