@@ -9,14 +9,12 @@ export async function runAgent(agentName, projectPath, payload) {
   const sessionId = await getAgentSession(projectPath, agentName);
   const prompt = await loadPrompt(agentName);
 
-  const message = JSON.stringify(
-    {
-      system_prompt: prompt,
-      input: payload,
-    },
-    null,
-    2
-  );
+  const message = [
+    prompt,
+    "",
+    "INPUT:",
+    JSON.stringify(payload, null, 2),
+    ].join("\n");
 
   const rawAnswer = await askAiSession(sessionId, message, {
     stream: false,

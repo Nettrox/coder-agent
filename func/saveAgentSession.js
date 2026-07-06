@@ -1,13 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
+import { formatSessionsMarkdown } from "./formatMarkdown.js";
 
 export async function saveAgentSession(projectPath, agentName, sessionId) {
-  const sessionFile = path.join(
-    projectPath,
-    ".ai-agent",
-    "sessions",
-    "agents.json"
-  );
+  const sessionsDir = path.join(projectPath, ".ai-agent", "sessions");
+  const sessionFile = path.join(sessionsDir, "agents.json");
+  const sessionMdFile = path.join(sessionsDir, "agents.md");
 
   let sessions = {};
 
@@ -19,9 +17,11 @@ export async function saveAgentSession(projectPath, agentName, sessionId) {
   }
 
   sessions[agentName] = {
+    ...(sessions[agentName] || {}),
     sessionId,
     updatedAt: new Date().toISOString(),
   };
 
   await fs.writeFile(sessionFile, JSON.stringify(sessions, null, 2), "utf8");
+  await fs.writeFile(sessionMdFile, formatSessionsMarkdown(sessions), "utf8");
 }

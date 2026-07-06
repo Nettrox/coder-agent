@@ -1,3 +1,5 @@
+import { requestAi } from "./requestAi.js";
+
 export async function createNewSession() {
   const form = new FormData();
 
@@ -7,16 +9,12 @@ export async function createNewSession() {
   form.append("rag", "false");
   form.append("skip_validation", "true");
 
-  const res = await fetch("http://127.0.0.1:7000/api/session", {
+  const res = await requestAi("http://127.0.0.1:7000/api/session", {
     method: "POST",
     body: form,
+    timeoutMs: 60000,
+    retries: 1,
   });
-
-  if (!res.ok) {
-    throw new Error(
-      `Session oluşturulamadı: ${res.status}\n${await res.text()}`
-    );
-  }
 
   const data = await res.json();
   return data.id;
