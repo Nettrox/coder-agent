@@ -4,6 +4,8 @@ export async function runFixer(projectPath, agentContext, state) {
   return await runAgent("fixer", projectPath, {
     ...agentContext,
     planner_output: state.plannerOutput,
+    retriever_output: state.retrieverOutput,
+    file_context: state.fileContext,
     coder_output: state.coderOutput,
     validator_output: state.validatorOutput,
   });

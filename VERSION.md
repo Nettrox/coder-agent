@@ -14,9 +14,9 @@ Completed
 
 ✔ Knowledge Processor
 
-In Progress
+✔ Retriever
 
-⬜ Retriever
+In Progress
 
 ⬜ Context Builder
 
