@@ -1,0 +1,12 @@
+Coding rules:
+- Follow the existing project style.
+- Make the smallest safe change.
+- Do not refactor unrelated code.
+- Do not rename files unless explicitly requested.
+- Do not add new dependencies unless necessary.
+- Do not remove existing features.
+- Do not change public APIs unless required.
+- Keep code readable and maintainable.
+- Prefer clear names over clever code.
+- Do not add unnecessary comments.
+- Preserve existing formatting as much as possible.

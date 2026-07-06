@@ -1,232 +1,486 @@
-# Chatgbt
+# AI Agent Workflow
 
-Odysseus API ile sohbet oturumları oluşturmak, mevcut oturumları kaydetmek ve önceki oturumlarla konuşmaya devam etmek için hazırlanmış basit bir Node.js uygulaması.
+## Overview
 
-## Özellikler
+This project is built around a multi-agent architecture. Each AI agent has a single responsibility and communicates with the next agent using structured JSON responses.
 
-- Yeni sohbet oturumu oluşturma
-- Son kullanılan oturumu bulma
-- Yeni veya mevcut oturuma mesaj gönderme
-- Streaming (anlık) cevap alma
-- Oturumları JSON dosyasında saklama
-- Sohbet başlıklarını otomatik kaydetme
+The primary goal is to create a predictable, modular, and scalable coding workflow where every agent performs one task only.
 
 ---
 
-## Gereksinimler
+# Workflow
 
-- Node.js 18+
-- Çalışan bir Odysseus sunucusu
-
-Varsayılan API adresi:
-
-```txt
-http://127.0.0.1:7000
-```
-
-Odysseus çalışmıyorsa istekler başarısız olacaktır.
-https://github.com/pewdiepie-archdaemon/odysseus
----
-
-## Kurulum
-
-Projeyi klonlayın:
-
-```bash
-git clone <repo-url>
-cd Chatgbt
-```
-
-Bağımlılıkları yükleyin:
-
-```bash
-npm install
-```
-
-package.json içerisinde aşağıdaki ayarın bulunduğundan emin olun:
-
-```json
-{
-  "type": "module"
-}
-```
-
----
-
-## Proje Yapısı
-
-```txt
-Chatgbt/
-│
-├── index.js
-│
-├── session_ids.json
-│
-└── func/
-    ├── createNewSession.js
-    ├── getInput.js
-    ├── getLatestSessionId.js
-    ├── newAskOdysseus.js
-    ├── oldAskOdysseus.js
-    └── saveCurrentSession.js
+```text
+                    User Request
+                         │
+                         ▼
+                  Planner AI
+                         │
+                         ▼
+                 Retriever AI
+                         │
+                         ▼
+             Context Builder AI
+                         │
+                         ▼
+                   Coder AI
+                         │
+                         ▼
+                 Validator AI
+                    │        │
+              Valid │        │ Invalid
+                    ▼        ▼
+              Reviewer AI  Fixer AI
+                    │        │
+                    │        └──────────────┐
+                    ▼                       │
+             Summarizer AI                  │
+                    │                       │
+                    ▼                       │
+            Session Manager AI ◄───────────┘
+                    │
+                    ▼
+        Commit Message Generator
+                    │
+                    ▼
+          Session Title Generator
+                    │
+                    ▼
+          Naming Consistency Check
+                    │
+                    ▼
+                 Final Output
 ```
 
 ---
 
-## Fonksiyonlar
+# Shared Rules
 
-### createNewSession()
+Every AI agent automatically receives the shared prompt files before executing.
 
-Yeni bir sohbet oturumu oluşturur.
-
-```js
-const sessionId = await createNewSession();
+```
+shared/
+├── json_rules.md
+├── coding_rules.md
+├── project_rules.md
+├── response_rules.md
+└── quality_rules.md
 ```
 
-Dönen değer:
+These shared prompts guarantee:
 
-```txt
-d32d83a2-dbc5-4044-8397-d20349e3187e
-```
+* Valid JSON responses
+* Consistent coding style
+* Respect for project architecture
+* Standard response structure
+* High-quality implementations
 
 ---
 
-### getLatestSessionId()
-
-`session_ids.json` dosyasındaki en son kayıtlı oturumu döndürür.
-
-```js
-const sessionId = await getLatestSessionId();
-```
+# Agent Responsibilities
 
 ---
 
-### newAskOdysseus()
+## Planner AI
 
-Yeni oluşturulan oturuma mesaj gönderir.
+### Purpose
 
-```js
-await newAskOdysseus(sessionId, "Merhaba");
-```
+Understand the user's request and generate an implementation plan.
 
-Cevaplar stream olarak terminale yazdırılır.
+### Responsibilities
 
----
+* Analyze the request.
+* Determine the project goal.
+* Decide which files will be affected.
+* Break the work into implementation steps.
+* Detect risks.
+* Detect missing context.
 
-### oldAskOdysseus()
+### Does NOT
 
-Mevcut bir oturumla konuşmaya devam eder.
+* Write code.
+* Modify files.
+* Generate patches.
 
-```js
-await oldAskOdysseus(sessionId, "Devam edelim");
-```
+### Output
 
----
-
-### saveCurrentSession()
-
-Oturum bilgisini ve sohbet başlığını kaydeder.
-
-```js
-await saveCurrentSession(sessionId);
-```
-
-Kayıt örneği:
-
-```json
-[
-  {
-    "index": 1,
-    "session_id": "d32d83a2-dbc5-4044-8397-d20349e3187e",
-    "title": "Starting a Conversation"
-  }
-]
-```
+* Goal
+* Tasks
+* Required files
+* Dependencies
+* Risks
 
 ---
 
-### getInput()
+## Retriever AI
 
-Terminalden kullanıcı girişi almak için kullanılır.
+### Purpose
 
-```js
-const question = await getInput("Soru: ");
-```
+Locate the minimum amount of project context required.
 
----
+### Responsibilities
 
-## Kullanım Örneği
+* Find relevant files.
+* Locate functions.
+* Locate classes.
+* Locate routes.
+* Locate dependencies.
+* Return only necessary context.
 
-```js
-import { getInput } from "./func/getInput.js";
-import { createNewSession } from "./func/createNewSession.js";
-import { newAskOdysseus } from "./func/newAskOdysseus.js";
-import { saveCurrentSession } from "./func/saveCurrentSession.js";
+### Does NOT
 
-const question = await getInput("Soru: ");
+* Write code.
+* Change files.
+* Create plans.
 
-const sessionId = await createNewSession();
+### Output
 
-await newAskOdysseus(sessionId, question);
-
-await saveCurrentSession(sessionId);
-```
-
-Çalıştırmak için:
-
-```bash
-node index.js
-```
+* Selected files
+* Selected symbols
+* Missing context
 
 ---
 
-## session_ids.json
+## Context Builder AI
 
-Uygulama kullanılan sohbetleri bu dosyada saklar.
+### Purpose
 
-Örnek:
+Prepare a clean context package for the coding model.
 
-```json
-[
-  {
-    "index": 1,
-    "session_id": "12345678-abcd-1234-abcd-1234567890ab",
-    "title": "How to use Docker"
-  },
-  {
-    "index": 2,
-    "session_id": "87654321-dcba-4321-dcba-0987654321ba",
-    "title": "Node.js Session Management"
-  }
-]
-```
+### Responsibilities
 
----
+Combine:
 
-## API Endpointleri
+* User request
+* Planner output
+* Retrieved files
+* Session memory
+* Project rules
 
-Uygulama aşağıdaki Odysseus endpointlerini kullanır:
+into one optimized context.
 
-### Yeni Session
+### Does NOT
 
-```http
-POST /api/session
-```
+* Write implementation code.
+* Change project logic.
 
-### Session Listesi
+### Output
 
-```http
-GET /api/sessions
-```
-
-### Chat Stream
-
-```http
-POST /api/chat_stream
-```
+* Optimized coding context
 
 ---
 
-## Lisans
+## Coder AI
 
-MIT
+### Purpose
+
+Implement the requested feature.
+
+### Responsibilities
+
+* Write code.
+* Modify existing files.
+* Create new files if requested.
+* Produce patches.
+* Follow project style.
+
+### Does NOT
+
+* Change the original plan.
+* Refactor unrelated code.
+* Add unnecessary dependencies.
+
+### Output
+
+* Modified files
+* New files
+* Patches
+* Summary
+
+---
+
+## Validator AI
+
+### Purpose
+
+Verify that generated code is correct.
+
+### Responsibilities
+
+Check:
+
+* Syntax
+* Imports
+* References
+* Type errors
+* Lint issues
+* Missing implementations
+* Invalid JSON
+* Runtime risks
+
+### Does NOT
+
+* Modify code.
+* Rewrite implementations.
+
+### Output
+
+* Validation status
+* Errors
+* Warnings
+
+---
+
+## Fixer AI
+
+### Purpose
+
+Repair only the issues reported by Validator.
+
+### Responsibilities
+
+* Fix syntax errors.
+* Fix missing imports.
+* Fix broken references.
+* Fix implementation mistakes.
+
+### Does NOT
+
+* Add features.
+* Refactor code.
+* Change project behavior.
+
+### Output
+
+* Fixed files
+* Remaining issues
+
+---
+
+## Reviewer AI
+
+### Purpose
+
+Perform a quality review before completion.
+
+### Responsibilities
+
+Evaluate:
+
+* Readability
+* Maintainability
+* Architecture
+* Performance
+* Security
+* Code cleanliness
+
+### Does NOT
+
+* Modify code.
+* Generate patches.
+
+### Output
+
+* Review score
+* Suggestions
+* Approval status
+
+---
+
+## Summarizer AI
+
+### Purpose
+
+Generate a concise summary of the completed work.
+
+### Responsibilities
+
+Summarize:
+
+* User goal
+* Completed work
+* Modified files
+* Decisions made
+* Remaining tasks
+
+### Output
+
+* Session summary
+
+---
+
+## Session Manager AI
+
+### Purpose
+
+Maintain long-term project memory.
+
+### Responsibilities
+
+Store:
+
+* Current goal
+* Completed tasks
+* Pending tasks
+* Changed files
+* Important decisions
+* Known issues
+
+### Output
+
+* Updated session memory
+
+---
+
+## Commit Message Generator
+
+### Purpose
+
+Generate a Git commit message.
+
+### Responsibilities
+
+Produce a Conventional Commit message.
+
+Example:
+
+```
+feat(auth): add remember me support
+```
+
+### Output
+
+* Commit type
+* Scope
+* Message
+
+---
+
+## Title Generator
+
+### Purpose
+
+Generate a short session title.
+
+Examples
+
+```
+Add Remember Me
+
+Fix Login Validation
+
+Refactor Payment Module
+```
+
+### Output
+
+* Session title
+
+---
+
+## Naming Checker
+
+### Purpose
+
+Ensure naming consistency across the project.
+
+### Responsibilities
+
+Review:
+
+* Variables
+* Functions
+* Classes
+* Files
+* Folders
+* Constants
+* Routes
+
+### Output
+
+* Naming issues
+* Suggested improvements
+
+---
+
+# Communication Rules
+
+Every agent communicates using JSON only.
+
+```
+Agent A
+      │
+      ▼
+Valid JSON
+      │
+      ▼
+Agent B
+```
+
+No markdown.
+
+No explanations.
+
+No code blocks.
+
+No free-form text.
+
+Every response must follow the predefined JSON schema.
+
+---
+
+# Design Principles
+
+* One agent = one responsibility.
+* Every response must be machine-readable.
+* Every step must be deterministic.
+* Context should be minimal.
+* Agents must never invent unavailable information.
+* Only the required files should be processed.
+* Shared rules are automatically applied to every agent.
+* All outputs must be compatible with the next agent.
+* The system must be scalable and easy to extend with new agents.
+
+---
+
+# Final Execution Pipeline
+
+```text
+User Request
+      │
+      ▼
+Planner
+      │
+      ▼
+Retriever
+      │
+      ▼
+Context Builder
+      │
+      ▼
+Coder
+      │
+      ▼
+Validator
+      │
+ ┌────┴────┐
+ │         │
+ ▼         ▼
+Review   Fix
+ │         │
+ └────┬────┘
+      ▼
+Summarizer
+      ▼
+Session Manager
+      ▼
+Commit Generator
+      ▼
+Title Generator
+      ▼
+Naming Checker
+      ▼
+Completed Session
+```
+
+This architecture ensures that every AI agent performs a single well-defined responsibility while producing deterministic, structured, and reliable outputs that can be consumed automatically by the next stage of the workflow.
