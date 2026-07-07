@@ -9,11 +9,13 @@ const SHARED_PROMPT_FILES = [
   "project_rules.md",
 ];
 
-export async function loadPromptFiles(agentName) {
+export async function loadPromptFiles(agentName, options = {}) {
+  const promptName = options.promptName || agentName;
+
   const root = process.cwd();
 
   const sharedDir = path.join(root, "prompts", "shared");
-  const agentPromptPath = path.join(root, "prompts", `${agentName}.md`);
+  const agentPromptPath = path.join(root, "prompts", `${promptName}.md`);
 
   const sharedPrompts = [];
 
@@ -31,6 +33,7 @@ export async function loadPromptFiles(agentName) {
 
   return {
     agentName,
+    promptName,
     sharedPrompts,
     agentPrompt,
   };

@@ -6,8 +6,11 @@ function section(title, content) {
 ${content}`;
 }
 
-export async function buildPrompt(agentName, payload) {
-  const { sharedPrompts, agentPrompt } = await loadPromptFiles(agentName);
+export async function buildPrompt(agentName, payload, options = {}) {
+  const { sharedPrompts, agentPrompt, promptName } = await loadPromptFiles(
+    agentName,
+    options
+  );
 
   const sharedSections = sharedPrompts
     .map((prompt) => section(`SHARED: ${prompt.name}`, prompt.content))
@@ -26,7 +29,7 @@ export async function buildPrompt(agentName, payload) {
     "",
     "---",
     "",
-    section(`AGENT: ${agentName}`, agentPrompt),
+    section(`AGENT: ${promptName}`, agentPrompt),
     "",
     "---",
     "",

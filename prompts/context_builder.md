@@ -168,7 +168,7 @@ Return only coder preparation data.
       "possible_new_files": [],
       "constraints": [],
       "expected_output": {
-        "format": "files_changed",
+        "format": "operations",
         "requires_full_file_content": true,
         "allowed_change_types": [
           "create",
