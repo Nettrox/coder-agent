@@ -1,7 +1,7 @@
+import { runCoderDispatcher } from "./runCoderDispatcher.js";
 import { runPlanner } from "./runPlanner.js";
 import { runRetriever } from "./runRetriever.js";
 import { runContextBuilder } from "./runContextBuilder.js";
-import { runCoder } from "./runCoder.js";
 import { runValidator } from "./runValidator.js";
 import { runFixer } from "./runFixer.js";
 import { runWriter } from "./runWriter.js";
@@ -35,12 +35,14 @@ export async function runPipeline(projectPath, agentContext) {
   );
 
   // Coder
-  const coderOutput = await runCoder(projectPath, agentContext, {
-    plannerOutput,
-    retrieverOutput,
-    fileContext,
-    contextBuilderOutput,
-  });
+  const coderDispatch = await runCoderDispatcher(projectPath, agentContext, {
+        plannerOutput,
+        retrieverOutput,
+        fileContext,
+        contextBuilderOutput,
+    });
+
+    const coderOutput = coderDispatch.coderOutput;
 
   // Validator
   const validatorOutput = await runValidator(projectPath, agentContext, {

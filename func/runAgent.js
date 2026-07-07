@@ -8,10 +8,16 @@ import { buildPrompt } from "./prompt/buildPrompt.js";
 import { validatePrompt } from "./prompt/validatePrompt.js";
 import { cachePrompt } from "./prompt/cachePrompt.js";
 
-export async function runAgent(agentName, projectPath, payload) {
+export async function runAgent(agentName, projectPath, payload, options = {}) {
+  const outputName = options.outputName || agentName;
+  const promptName = options.promptName || agentName;
+
   const sessionId = await getAgentSession(projectPath, agentName);
 
-  const prompt = await buildPrompt(agentName, payload);
+  const prompt = await buildPrompt(agentName, payload, {
+    promptName,
+  });
+
   const promptValidation = validatePrompt(prompt);
 
   if (!promptValidation.valid) {
@@ -25,10 +31,12 @@ export async function runAgent(agentName, projectPath, payload) {
       data: {},
     };
 
-    await saveAgentOutput(projectPath, agentName, failedOutput);
+    await saveAgentOutput(projectPath, outputName, failedOutput);
 
     await logAgentRun(projectPath, {
       agent: agentName,
+      promptName,
+      outputName,
       sessionId,
       input: payload,
       rawOutput: "",
@@ -39,7 +47,7 @@ export async function runAgent(agentName, projectPath, payload) {
     return failedOutput;
   }
 
-  await cachePrompt(projectPath, agentName, prompt);
+  await cachePrompt(projectPath, outputName, prompt);
 
   const rawAnswer = await askAiSession(sessionId, prompt, {
     stream: false,
@@ -47,13 +55,15 @@ export async function runAgent(agentName, projectPath, payload) {
 
   const parsedAnswer = parseJsonResponse(rawAnswer);
 
-  await saveAgentOutput(projectPath, agentName, parsedAnswer);
+  await saveAgentOutput(projectPath, outputName, parsedAnswer);
 
   await logAgentRun(projectPath, {
     agent: agentName,
+    promptName,
+    outputName,
     sessionId,
     input: payload,
-    promptCache: `.ai-agent/cache/prompts/${agentName}.prompt.md`,
+    promptCache: `.ai-agent/cache/prompts/${outputName}.prompt.md`,
     rawOutput: rawAnswer,
     parsedOutput: parsedAnswer,
     success: parsedAnswer.success,
