@@ -1,28 +1,40 @@
 import { runPlanner } from "./runPlanner.js";
 import { runRetriever } from "./runRetriever.js";
+import { runContextBuilder } from "./runContextBuilder.js";
 import { runCoder } from "./runCoder.js";
 import { runValidator } from "./runValidator.js";
 import { runFixer } from "./runFixer.js";
+import { runWriter } from "./runWriter.js";
+
 import { buildRetrieverContext } from "../context/buildRetrieverContext.js";
-import { runContextBuilder } from "./runContextBuilder.js";
 
 export async function runPipeline(projectPath, agentContext) {
+  // Planner
   const plannerOutput = await runPlanner(projectPath, agentContext);
 
+  // Retriever
   const retrieverOutput = await runRetriever(projectPath, agentContext, {
     plannerOutput,
   });
 
+  // File Context
   const fileContext = await buildRetrieverContext(
     projectPath,
     retrieverOutput
   );
-  const contextBuilderOutput = await runContextBuilder(projectPath, agentContext, {
-    plannerOutput,
-    retrieverOutput,
-    fileContext,
-    });
 
+  // Context Builder
+  const contextBuilderOutput = await runContextBuilder(
+    projectPath,
+    agentContext,
+    {
+      plannerOutput,
+      retrieverOutput,
+      fileContext,
+    }
+  );
+
+  // Coder
   const coderOutput = await runCoder(projectPath, agentContext, {
     plannerOutput,
     retrieverOutput,
@@ -30,6 +42,7 @@ export async function runPipeline(projectPath, agentContext) {
     contextBuilderOutput,
   });
 
+  // Validator
   const validatorOutput = await runValidator(projectPath, agentContext, {
     plannerOutput,
     retrieverOutput,
@@ -37,15 +50,34 @@ export async function runPipeline(projectPath, agentContext) {
     coderOutput,
   });
 
+  // Fixer (optional)
+  let fixerOutput = null;
   let finalOutput = coderOutput;
 
   if (validatorOutput?.data?.needs_fixer) {
-    finalOutput = await runFixer(projectPath, agentContext, {
+    fixerOutput = await runFixer(projectPath, agentContext, {
       plannerOutput,
       retrieverOutput,
       fileContext,
+      contextBuilderOutput,
       coderOutput,
       validatorOutput,
+    });
+
+    finalOutput = fixerOutput;
+  }
+
+  // Writer
+  let writerOutput = null;
+
+  const canWrite =
+    validatorOutput?.data?.valid === true ||
+    fixerOutput?.success === true;
+
+  if (canWrite) {
+    writerOutput = await runWriter(projectPath, agentContext, {
+      coderOutput,
+      fixerOutput,
     });
   }
 
@@ -56,19 +88,24 @@ export async function runPipeline(projectPath, agentContext) {
     errors: finalOutput?.errors || [],
 
     data: {
-        agents: {
+      agents: {
         planner: plannerOutput,
         retriever: retrieverOutput,
         context_builder: contextBuilderOutput,
         coder: coderOutput,
         validator: validatorOutput,
-        },
+        fixer: fixerOutput,
+      },
 
-        contexts: {
+      contexts: {
         file_context: fileContext,
-        },
+      },
 
-        final: finalOutput,
+      execution: {
+        writer: writerOutput,
+      },
+
+      final: finalOutput,
     },
-    };
+  };
 }

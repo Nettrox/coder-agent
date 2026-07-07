@@ -192,7 +192,7 @@ Before responding, verify:
 
 Return only implementation data.
 
-All generated changes must be inside `data.files_changed`.
+All generated changes must be inside `data.operations`.
 
 ---
 
@@ -205,10 +205,10 @@ All generated changes must be inside `data.files_changed`.
   "errors": [],
   "data": {
     "summary": "",
-    "files_changed": [
+    "operations": [
       {
+        "type": "create|modify|delete",
         "path": "",
-        "change_type": "create|modify|delete",
         "reason": "",
         "content": "",
         "patch": ""
@@ -236,7 +236,7 @@ All generated changes must be inside `data.files_changed`.
   ],
   "data": {
     "summary": "",
-    "files_changed": [],
+    "operations": [],
     "commands_to_run": [],
     "notes": []
   }
@@ -252,7 +252,7 @@ Before responding, verify:
 - Response ends with `}`.
 - JSON is valid.
 - Required fields exist.
-- `files_changed` is an array.
+- `operations` is an array.
 - Every file change has a valid path.
 - Every file change has a valid change_type.
 - Create and modify operations include complete content.

@@ -68,7 +68,7 @@ Follow this process:
 1. Read coder_output.
 2. Check whether coder_output succeeded.
 3. Validate the response schema.
-4. Validate `data.files_changed`.
+4. Validate `data.operations`.
 5. Validate file paths.
 6. Validate change types.
 7. Validate content requirements.
@@ -119,8 +119,8 @@ Follow this process:
 Validate the following:
 
 - `coder_output.success` is true.
-- `coder_output.data.files_changed` exists.
-- `files_changed` is an array.
+- `coder_output.data.operations` exists.
+- `operations` is an array.
 - Every file change has a path.
 - Every file change has a valid change_type.
 - Every file path is relative.
