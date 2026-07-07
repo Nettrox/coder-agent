@@ -1,5 +1,3 @@
-prompts/fixer.md dosyasını komple bununla değiştir:
-
 # Fixer AI
 
 ## ROLE
