@@ -9,7 +9,7 @@ export async function createNewSession() {
   form.append("rag", "false");
   form.append("skip_validation", "true");
 
-  const res = await requestAi("http://127.0.0.1:7000/api/session", {
+  const res = await requestAi("http://127.0.0.1:7001/api/session", {
     method: "POST",
     body: form,
     timeoutMs: 60000,
@@ -36,7 +36,7 @@ export async function createNewSession() {
 //   form.append("rag", "false");
 //   form.append("skip_validation", "true");
 
-//   const res = await requestAi("http://127.0.0.1:7000/api/session", {
+//   const res = await requestAi("http://127.0.0.1:7001/api/session", {
 //     method: "POST",
 //     body: form,
 //     timeoutMs: 60000,

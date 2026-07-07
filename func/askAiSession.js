@@ -3,7 +3,7 @@ import { requestAi } from "./requestAi.js";
 export async function askAiSession(sessionId, message, options = {}) {
   const { stream = false } = options;
 
-  const response = await requestAi("http://127.0.0.1:7000/api/chat_stream", {
+  const response = await requestAi("http://127.0.0.1:7001/api/chat_stream", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export async function askAiSession(sessionId, message, options = {}) {
 // export async function askAiSession(sessionId, message, options = {}) {
 //   const { stream = false } = options;
 
-//   const response = await requestAi("http://127.0.0.1:7000/api/chat_stream", {
+//   const response = await requestAi("http://127.0.0.1:7001/api/chat_stream", {
 //     method: "POST",
 //     headers: {
 //       "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 {
   "coder": {
-    "mode": "pool",
+    "mode": "single",
     "maxWorkers": 4,
     "poolThreshold": 8
   }
